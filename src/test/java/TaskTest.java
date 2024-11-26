@@ -190,4 +190,35 @@ class TaskTest {
         task.createTitle("Таска_версия_3");
         assertEquals("Таска_версия_2", manager.getHistory().get(0).getTitle());
     }
+
+    @Test
+    void orderTest() {
+        TaskManager taskManager = Managers.getDefault();
+        Task task = new Task();
+        Task task2 = new Task();
+        Epic epic = new Epic();
+        Epic epic2 = new Epic();
+        Subtask subtask = new Subtask();
+        Subtask subtask2 = new Subtask();
+        epic.addSubtask(subtask);
+        epic2.addSubtask(subtask2);
+        taskManager.addTask(task);
+        taskManager.addTask(task2);
+        taskManager.addEpicTask(epic);
+        taskManager.addEpicTask(epic2);
+        taskManager.addSubTask(subtask);
+        taskManager.addSubTask(subtask2);
+        taskManager.getTaskById(task.getId());
+        taskManager.getTaskById(task2.getId());
+        taskManager.getEpicTaskById(epic.getId());
+        taskManager.getEpicTaskById(epic2.getId());
+        taskManager.getSubTaskById(subtask.getId());
+        taskManager.getSubTaskById(subtask2.getId());
+        taskManager.getTaskById(task.getId());
+        List<Task> history = taskManager.getHistory();
+
+        System.out.println(history);
+        System.out.println(task);
+        assertEquals(task.getId(), history.get(history.size()-1).getId());
+    }
 }
