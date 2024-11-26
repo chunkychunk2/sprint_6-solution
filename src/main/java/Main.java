@@ -115,6 +115,31 @@ public class Main {
         System.out.println(manager.getEpicTaskById(epic1.getId()).getSubtasks());
 
 
+        Epic epic6 = new Epic();
+        Subtask subtask7 = new Subtask();
+        Subtask subtask8 = new Subtask();
+        Subtask subtask9 = new Subtask();
+        epic6.addSubtask(subtask7);
+        epic6.addSubtask(subtask8);
+        epic6.addSubtask(subtask9);
+        manager.addEpicTask(epic6);
+        manager.addSubTask(subtask7);
+        manager.addSubTask(subtask8);
+        manager.addSubTask(subtask9);
+        manager.getEpicTaskById(epic6.getId());
+        manager.getSubTaskById(subtask7.getId());
+        manager.getSubTaskById(subtask8.getId());
+        manager.getSubTaskById(subtask9.getId());
+        System.out.println(manager.getHistory());
+        manager.deleteEpicTask(epic6.getId());
+        System.out.println(manager.getHistory());
+
+        Task task12 = new Task();
+        manager.addTask(task12);
+        manager.getTaskById(task.getId());
+        System.out.println(manager.getHistory());
+        manager.deleteTask(task12.getId());
+        System.out.println(manager.getHistory());
     }
 
 

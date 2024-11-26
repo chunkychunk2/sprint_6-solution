@@ -221,4 +221,38 @@ class TaskTest {
         System.out.println(task);
         assertEquals(task.getId(), history.get(history.size()-1).getId());
     }
+
+    @Test
+    void deleteTaskFromHistoryTest(){
+        TaskManager taskManager = Managers.getDefault();
+        Task task = new Task();
+        taskManager.addTask(task);
+        taskManager.getTaskById(task.getId());
+        assertEquals(1,taskManager.getHistory().size());
+        taskManager.deleteTask(task.getId());
+        assertEquals(0,taskManager.getHistory().size());
+    }
+
+    @Test
+    void deleteEpicFromHistoryTest(){
+        TaskManager taskManager = Managers.getDefault();
+        Epic epic = new Epic();
+        Subtask subtask = new Subtask();
+        Subtask subtask2 = new Subtask();
+        Subtask subtask3 = new Subtask();
+        epic.addSubtask(subtask);
+        epic.addSubtask(subtask2);
+        epic.addSubtask(subtask3);
+        taskManager.addEpicTask(epic);
+        taskManager.addSubTask(subtask);
+        taskManager.addSubTask(subtask2);
+        taskManager.addSubTask(subtask3);
+        taskManager.getEpicTaskById(epic.getId());
+        taskManager.getSubTaskById(subtask.getId());
+        taskManager.getSubTaskById(subtask2.getId());
+        taskManager.getSubTaskById(subtask3.getId());
+        assertEquals(4,taskManager.getHistory().size());
+        taskManager.deleteEpicTask(epic.getId());
+        assertEquals(0,taskManager.getHistory().size());
+    }
 }
