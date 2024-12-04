@@ -12,4 +12,7 @@ public class Managers {
     public static HistoryManager getDefaultHistory() {
         return new InMemoryHistoryManager();
     }
+    public static TaskManager getDefaultFileBacked(String path) {
+        return new FileBackedTaskManager(path);
+    }
 }
