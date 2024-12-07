@@ -5,14 +5,12 @@ import com.yandex.taskmanager.TaskManager;
 
 public class Managers {
 
-    public static TaskManager getDefault() {
-        return new InMemoryTaskManager();
+    public static TaskManager getDefault(String path) {
+        return new FileBackedTaskManager(path);
     }
 
     public static HistoryManager getDefaultHistory() {
         return new InMemoryHistoryManager();
     }
-    public static TaskManager getDefaultFileBacked(String path) {
-        return new FileBackedTaskManager(path);
-    }
+
 }

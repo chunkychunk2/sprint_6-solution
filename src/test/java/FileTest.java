@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class FileTest {
 
     @Test
-    void loadFromFileTest() throws IOException {
+    void loadFromFileTest() throws Exception {
         File tempFile = File.createTempFile("testFile", ".txt");
         try (FileWriter writer = new FileWriter(tempFile)) {
             writer.write("id,type,name,status,description,epicId\n" +
@@ -57,7 +57,7 @@ public class FileTest {
         File tempFile = File.createTempFile("testFile", ".txt");
         String content = Files.readString(tempFile.toPath());
         assertEquals("", content);
-        TaskManager manager = Managers.getDefaultFileBacked(tempFile.toPath().toString());
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         Task someTask = new Task();
         someTask.createTitle("Обычная таска");
         someTask.setDescription("Описание таски");
@@ -89,7 +89,7 @@ public class FileTest {
         File tempFile = File.createTempFile("testFile", ".txt");
         String content = Files.readString(tempFile.toPath());
         assertEquals("", content);
-        TaskManager manager = Managers.getDefaultFileBacked(tempFile.toPath().toString());
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         manager.deleteAllTasks();
         manager.deleteAllEpicTasks();
         manager.deleteAllSubTasks();
@@ -101,7 +101,7 @@ public class FileTest {
     }
 
     @Test
-    void loadFromEmptyFileTest() throws IOException {
+    void loadFromEmptyFileTest() throws Exception {
         File tempFile = File.createTempFile("testFile", ".txt");
         TaskManager taskManager = FileBackedTaskManager.loadFromFile(tempFile);
         ArrayList<Task> emptyTasks = new ArrayList<>();

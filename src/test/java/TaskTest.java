@@ -2,12 +2,16 @@ import com.yandex.taskmanager.*;
 import com.yandex.taskmanager.model.Epic;
 import com.yandex.taskmanager.model.Subtask;
 import com.yandex.taskmanager.model.Task;
+import com.yandex.taskmanager.service.FileBackedTaskManager;
 import com.yandex.taskmanager.service.InMemoryHistoryManager;
 import com.yandex.taskmanager.service.InMemoryTaskManager;
 import com.yandex.taskmanager.service.Managers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,10 +50,13 @@ class TaskTest {
     }
 
     @Test
-    void ManagersClassTest() {
-        TaskManager manager = Managers.getDefault();
+    void ManagersClassTest() throws IOException {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         HistoryManager historyManager = Managers.getDefaultHistory();
-        assertEquals(manager.getClass(), InMemoryTaskManager.class);
+        assertEquals(manager.getClass(), FileBackedTaskManager.class);
         assertEquals(historyManager.getClass(), InMemoryHistoryManager.class);
         Task task = new Task();
         manager.addTask(task);
@@ -58,8 +65,11 @@ class TaskTest {
     }
 
     @Test
-    void InMemoryTaskManagerTest() {
-        TaskManager manager = Managers.getDefault();
+    void InMemoryTaskManagerTest() throws IOException {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
         Epic epic = new Epic();
         Subtask subtask = new Subtask();
@@ -72,24 +82,30 @@ class TaskTest {
     }
 
     @Test
-    void CreatedAndGeneratedIdsTest() {
+    void CreatedAndGeneratedIdsTest() throws IOException {
         Task task = new Task();
         Task task2 = new Task();
         task2.setId(task.getId());
-        TaskManager manager = Managers.getDefault();
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         manager.addTask(task);
         manager.addTask(task2);
         assertEquals(1, manager.getAllTasks().size());
     }
 
     @Test
-    void TaskTestAfterAddingToManager() {
+    void TaskTestAfterAddingToManager() throws IOException {
         Task task = new Task();
         task.createTitle("Таска");
         task.setDescription("Описание");
         task.setStatus(Status.IN_PROGRESS);
         int id = task.getId();
-        TaskManager manager = Managers.getDefault();
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         manager.addTask(task);
         assertEquals("Таска", task.getTitle());
         assertEquals("Описание", task.getDescription());
@@ -98,8 +114,11 @@ class TaskTest {
     }
 
     @Test
-    void addNewTask() {
-        TaskManager manager = Managers.getDefault();
+    void addNewTask() throws IOException {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
         task.createTitle("Test addNewTask");
         task.setDescription("Test addNewTask description");
@@ -134,10 +153,13 @@ class TaskTest {
     }
 
     @Test
-    void checkDeletedSubtasksId() {
+    void checkDeletedSubtasksId() throws IOException {
         Epic epic = new Epic();
         Subtask subtask = new Subtask();
-        TaskManager taskManager = Managers.getDefault();
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         taskManager.addEpicTask(epic);
         taskManager.addSubTask(subtask);
         epic.addSubtask(subtask);
@@ -148,10 +170,13 @@ class TaskTest {
     }
 
     @Test
-    void checkDeletedSubtasksIdInEpic() {
+    void checkDeletedSubtasksIdInEpic() throws IOException {
         Epic epic = new Epic();
         Subtask subtask = new Subtask();
-        TaskManager taskManager = Managers.getDefault();
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         taskManager.addEpicTask(epic);
         taskManager.addSubTask(subtask);
         epic.addSubtask(subtask);
@@ -161,8 +186,11 @@ class TaskTest {
     }
 
     @Test
-    void objectSettersTest() {
-        TaskManager taskManager = Managers.getDefault();
+    void objectSettersTest() throws IOException {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
         Task task2 = new Task();
         taskManager.addTask(task);
@@ -178,8 +206,11 @@ class TaskTest {
     }
 
     @Test
-    void HistoryManagerTest() {
-        TaskManager manager = Managers.getDefault();
+    void HistoryManagerTest() throws IOException {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
         manager.addTask(task);
         task.createTitle("Таска_версия_1");
@@ -192,8 +223,11 @@ class TaskTest {
     }
 
     @Test
-    void orderTest() {
-        TaskManager taskManager = Managers.getDefault();
+    void orderTest() throws IOException {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
         Task task2 = new Task();
         Epic epic = new Epic();
@@ -223,8 +257,11 @@ class TaskTest {
     }
 
     @Test
-    void deleteTaskFromHistoryTest() {
-        TaskManager taskManager = Managers.getDefault();
+    void deleteTaskFromHistoryTest() throws IOException {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
         taskManager.addTask(task);
         taskManager.getTaskById(task.getId());
@@ -234,8 +271,11 @@ class TaskTest {
     }
 
     @Test
-    void deleteEpicFromHistoryTest() {
-        TaskManager taskManager = Managers.getDefault();
+    void deleteEpicFromHistoryTest() throws IOException {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         Epic epic = new Epic();
         Subtask subtask = new Subtask();
         Subtask subtask2 = new Subtask();

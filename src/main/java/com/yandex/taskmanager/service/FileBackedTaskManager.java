@@ -1,6 +1,7 @@
 package com.yandex.taskmanager.service;
 
 import com.yandex.taskmanager.Status;
+import com.yandex.taskmanager.exceptions.ManagerLoadException;
 import com.yandex.taskmanager.exceptions.ManagerSaveException;
 import com.yandex.taskmanager.model.Epic;
 import com.yandex.taskmanager.model.Subtask;
@@ -8,6 +9,7 @@ import com.yandex.taskmanager.model.Task;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -46,15 +48,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public Task fromString(String value) {
         String[] taskInfo = value.split(",");
-        if (taskInfo[1].trim().equals("Task"))
-            return new Task(Integer.parseInt(taskInfo[0]), taskInfo[2], Status.valueOf(taskInfo[3].trim()), taskInfo[4]);
-        else if (taskInfo[1].trim().equals("Epic")) return new Epic(Integer.parseInt(taskInfo[0]), taskInfo[2],
-                Status.valueOf(taskInfo[3].trim()), taskInfo[4]);
-        else return new Subtask(Integer.parseInt(taskInfo[0]), taskInfo[2],
+        if (taskInfo[1].trim().equals("Task")) {
+            return new Task(Integer.parseInt(taskInfo[0]), taskInfo[2], Status.valueOf(taskInfo[3].trim()),
+                    taskInfo[4]);
+        } else if (taskInfo[1].trim().equals("Epic")) {
+            return new Epic(Integer.parseInt(taskInfo[0]), taskInfo[2],
+                    Status.valueOf(taskInfo[3].trim()), taskInfo[4]);
+        } else if (taskInfo[1].trim().equals("Subtask")) {
+            return new Subtask(Integer.parseInt(taskInfo[0]), taskInfo[2],
                     Status.valueOf(taskInfo[3].trim()), taskInfo[4], Integer.parseInt(taskInfo[5].trim()));
+        } else throw new ManagerLoadException("Ошибка чтения записи: " + Arrays.toString(taskInfo));
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) {
+    public static FileBackedTaskManager loadFromFile(File file) throws Exception {
         FileBackedTaskManager fromFile = new FileBackedTaskManager(file.toString());
         StringBuilder stringFile = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -63,27 +69,29 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 stringFile.append(System.lineSeparator());
             }
             String[] lines = stringFile.toString().split(System.lineSeparator());
-            List<Task> tasks = new ArrayList<>();
             for (int i = 1; i < lines.length; i++) {
-                tasks.add(fromFile.fromString(lines[i]));
-                switch (tasks.get(i-1).getTaskType()) {
+                Task task = fromFile.fromString(lines[i]);
+                switch (task.getTaskType()) {
                     case TASK: {
-                        fromFile.addTask(tasks.get(i-1));
+                        fromFile.addTask(task);
                         break;
                     }
                     case EPIC: {
-                        fromFile.addEpicTask((Epic) tasks.get(i-1));
+                        fromFile.addEpicTask((Epic) task);
                         break;
                     }
                     case SUBTASK: {
-                        fromFile.addSubTask((Subtask) tasks.get(i-1));
+                        fromFile.addSubTask((Subtask) task);
                         break;
                     }
                 }
             }
             return fromFile;
+
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new Exception(e);
         }
     }
 
