@@ -10,7 +10,16 @@ public class Epic extends Task {
 
     public Epic() {
         subtasks = new ArrayList<>();
+        setTaskType(TaskTypes.EPIC);
+    }
 
+    public Epic(int id, String title, Status status, String description) {
+        setId(id);
+        createTitle(title);
+        setStatus(status);
+        setDescription(description);
+        subtasks = new ArrayList<>();
+        setTaskType(TaskTypes.EPIC);
     }
 
     public void deleteSubtask(Subtask subtask) {
@@ -43,5 +52,10 @@ public class Epic extends Task {
         }
         if (result) setStatus(Status.DONE);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return getId() + ", Epic, " + getTitle() + ", " + getStatus() + ", " + getDescription();
     }
 }

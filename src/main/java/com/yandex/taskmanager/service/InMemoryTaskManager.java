@@ -42,15 +42,12 @@ public class InMemoryTaskManager implements TaskManager {
     public void addSubTask(Subtask task) {
         if (!allSubTasks.containsKey(task.getId())) allSubTasks.put(task.getId(), task);
         else System.out.println("Подзадача с данным id уже существует!");
-
-
     }
 
     @Override
     public void addEpicTask(Epic task) {
         if (!allEpicTasks.containsKey(task.getId())) allEpicTasks.put(task.getId(), task);
         else System.out.println("Эпик с данным id уже существует!");
-
     }
 
     @Override
