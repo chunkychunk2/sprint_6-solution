@@ -48,16 +48,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public Task fromString(String value) {
         String[] taskInfo = value.split(",");
-        if (taskInfo[1].trim().equals("Task")) {
-            return new Task(Integer.parseInt(taskInfo[0]), taskInfo[2], Status.valueOf(taskInfo[3].trim()),
-                    taskInfo[4]);
-        } else if (taskInfo[1].trim().equals("Epic")) {
-            return new Epic(Integer.parseInt(taskInfo[0]), taskInfo[2],
-                    Status.valueOf(taskInfo[3].trim()), taskInfo[4]);
-        } else if (taskInfo[1].trim().equals("Subtask")) {
-            return new Subtask(Integer.parseInt(taskInfo[0]), taskInfo[2],
-                    Status.valueOf(taskInfo[3].trim()), taskInfo[4], Integer.parseInt(taskInfo[5].trim()));
-        } else throw new ManagerLoadException("Ошибка чтения записи: " + Arrays.toString(taskInfo));
+        String taskType = taskInfo[1].trim();
+        String taskStatus = taskInfo[3].trim();
+        switch (taskType) {
+            case "Task":
+                return new Task(Integer.parseInt(taskInfo[0]), taskInfo[2], Status.valueOf(taskStatus),
+                        taskInfo[4]);
+            case "Epic":
+                return new Epic(Integer.parseInt(taskInfo[0]), taskInfo[2],
+                        Status.valueOf(taskStatus), taskInfo[4]);
+            case "Subtask":
+                return new Subtask(Integer.parseInt(taskInfo[0]), taskInfo[2],
+                        Status.valueOf(taskStatus), taskInfo[4], Integer.parseInt(taskInfo[5].trim()));
+            default:
+                throw new ManagerLoadException("Ошибка чтения записи: " + Arrays.toString(taskInfo));
+        }
     }
 
     public static FileBackedTaskManager loadFromFile(File file) throws Exception {
@@ -91,7 +96,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
-            throw new Exception(e);
+            throw e;
         }
     }
 
