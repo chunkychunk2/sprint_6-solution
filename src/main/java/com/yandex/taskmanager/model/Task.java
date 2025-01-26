@@ -15,9 +15,28 @@ public class Task {
 
     private Status status;
 
+    private TaskTypes taskType;
+
     public Task() {
         status = Status.NEW;
         id = InMemoryTaskManager.getTaskId();
+        taskType = TaskTypes.TASK;
+    }
+
+    public Task(int id, String title, Status status, String description) {
+        this.id = id;
+        this.title = title;
+        this.status = status;
+        this.description = description;
+        taskType = TaskTypes.TASK;
+    }
+
+    public TaskTypes getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskTypes taskType) {
+        this.taskType = taskType;
     }
 
     public String getDescription() {
@@ -64,5 +83,10 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return id + ", Task, " + title + ", " + status + ", " + description;
     }
 }

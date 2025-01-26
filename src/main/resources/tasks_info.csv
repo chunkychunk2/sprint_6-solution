@@ -1,0 +1,5 @@
+id,type,name,status,description,epicId
+1, Task, Обычная таска, NEW, Описание таски
+2, Epic, Эпическая задача_1, IN_PROGRESS, Это очень важная задача
+3, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 2
+
