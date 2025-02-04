@@ -2,6 +2,9 @@ package com.yandex.taskmanager.model;
 
 import com.yandex.taskmanager.Status;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
 
     private Epic epic;
@@ -19,6 +22,18 @@ public class Subtask extends Task {
         setDescription(description);
         setTaskType(TaskTypes.SUBTASK);
         this.epicId = epicId;
+    }
+
+    public Subtask(int id, String title, Status status, String description,
+                   Duration duration, LocalDateTime startTime, int epicId) {
+        setId(id);
+        createTitle(title);
+        setStatus(status);
+        setDescription(description);
+        setTaskType(TaskTypes.SUBTASK);
+        this.epicId = epicId;
+        setDuration(duration);
+        setStartTime(startTime);
     }
 
     public Integer getEpicId() {
@@ -45,6 +60,7 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return getId() + ", Subtask, " + getTitle() + ", " + getStatus() + ", " + getDescription() + ", " + epicId;
+        return getId() + ", Subtask, " + getTitle() + ", " + getStatus()
+                + ", " + getDescription() + ", " + getDuration().toMinutes() + ", " + getStartTime() + ", " + epicId;
     }
 }

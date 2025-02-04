@@ -52,4 +52,8 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
+    boolean isTaskOverlap(Task task);
+
+    List<Task> getPrioritizedTasks();
+
 }

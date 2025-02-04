@@ -1,5 +1,4 @@
-id,type,name,status,description,epicId
-1, Task, Обычная таска, NEW, Описание таски
-2, Epic, Эпическая задача_1, IN_PROGRESS, Это очень важная задача
-3, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 2
+id,type,name,status,description,duration,startTime,epicId
+1, Task, name1, NEW, description1, 15, 2025-02-04T13:23:02.939555600
+2, Task, name2, NEW, description2, 15, 2025-02-04T13:23:02.939555600
 

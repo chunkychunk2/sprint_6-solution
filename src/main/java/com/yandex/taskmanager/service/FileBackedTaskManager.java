@@ -8,6 +8,8 @@ import com.yandex.taskmanager.model.Subtask;
 import com.yandex.taskmanager.model.Task;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +24,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public void save() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-            bw.write("id,type,name,status,description,epicId");
+            bw.write("id,type,name,status,description,duration,startTime,epicId");
             bw.newLine();
             for (Task task : getAllTasks()) {
                 bw.write(toString(task));
@@ -53,13 +55,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         switch (taskType) {
             case "Task":
                 return new Task(Integer.parseInt(taskInfo[0]), taskInfo[2], Status.valueOf(taskStatus),
-                        taskInfo[4]);
+                        taskInfo[4], Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())), LocalDateTime.parse(taskInfo[6].trim()));
             case "Epic":
                 return new Epic(Integer.parseInt(taskInfo[0]), taskInfo[2],
-                        Status.valueOf(taskStatus), taskInfo[4]);
+                        Status.valueOf(taskStatus), taskInfo[4],Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())), LocalDateTime.parse(taskInfo[6].trim()));
             case "Subtask":
                 return new Subtask(Integer.parseInt(taskInfo[0]), taskInfo[2],
-                        Status.valueOf(taskStatus), taskInfo[4], Integer.parseInt(taskInfo[5].trim()));
+                        Status.valueOf(taskStatus), taskInfo[4], Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())),
+                        LocalDateTime.parse(taskInfo[6].trim()), Integer.parseInt(taskInfo[7].trim()));
             default:
                 throw new ManagerLoadException("Ошибка чтения записи: " + Arrays.toString(taskInfo));
         }
