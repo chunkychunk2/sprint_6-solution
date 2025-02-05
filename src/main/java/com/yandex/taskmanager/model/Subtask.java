@@ -36,6 +36,17 @@ public class Subtask extends Task {
         setStartTime(startTime);
     }
 
+    public Subtask(int id, String title, Status status, String description,
+                   Duration duration, LocalDateTime startTime) {
+        setId(id);
+        createTitle(title);
+        setStatus(status);
+        setDescription(description);
+        setTaskType(TaskTypes.SUBTASK);
+        setDuration(duration);
+        setStartTime(startTime);
+    }
+
     public Integer getEpicId() {
         return epicId;
     }

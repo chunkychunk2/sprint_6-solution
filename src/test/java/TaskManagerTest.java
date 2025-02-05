@@ -17,8 +17,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TaskManagerTest {
-    private TaskManager taskManager;
+class TaskManagerTest <T extends TaskManager> {
+    protected TaskManager taskManager;
 
     @BeforeEach
     void setUp() throws IOException {

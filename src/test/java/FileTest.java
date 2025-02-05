@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,9 +25,10 @@ public class FileTest {
         File tempFile = File.createTempFile("testFile", ".txt");
         try (FileWriter writer = new FileWriter(tempFile)) {
             writer.write("id,type,name,status,description,epicId\n" +
-                    "1, Task, Обычная таска, NEW, Описание таски, 30, 2025-01-28T00:24:51.190778600\n" +
-                    "2, Epic, Эпическая задача_1, IN_PROGRESS, Это очень важная задача, 15, 2025-01-28T01:04:51.191778800\n" +
-                    "3, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 15, 2025-01-28T00:24:51.211778400, 2\n");
+                    "1, TASK, Обычная таска, NEW, Описание таски, 30, 2025-01-28T00:24:51.190778600\n" +
+                    "2, EPIC, Эпическая задача_1, IN_PROGRESS, Это очень важная задача, 15, 2025-01-28T01:04:51" +
+                    ".191778800\n" +
+                    "3, SUBTASK, Сабтаска эпика 1, DONE, Описание сабтаски, 15, 2025-01-28T00:24:51.211778400, 2\n");
         }
         TaskManager taskManager = FileBackedTaskManager.loadFromFile(tempFile);
         Task task = new Task();
@@ -60,25 +62,27 @@ public class FileTest {
         String content = Files.readString(tempFile.toPath());
         assertEquals("", content);
         TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
-        String actualTime = LocalDateTime.now().toString();
+        String actualTime = "2024-01-27T10:30:03";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(actualTime, formatter);
         Task someTask = new Task();
         someTask.createTitle("Обычная таска");
         someTask.setDescription("Описание таски");
-        someTask.setStartTime(LocalDateTime.parse((actualTime)));
+        someTask.setStartTime(dateTime);
         someTask.setDuration(Duration.ofMinutes(30));
         Epic someAnotherEpicTask = new Epic();
         someAnotherEpicTask.createTitle("Эпическая задача_1");
         someAnotherEpicTask.setDescription("Это очень важная задача");
         someAnotherEpicTask.setStatus(Status.IN_PROGRESS);
-        someAnotherEpicTask.setStartTime(LocalDateTime.parse((actualTime)));
+        someAnotherEpicTask.setStartTime(dateTime);
         someAnotherEpicTask.setDuration(Duration.ofMinutes(15));
-        someAnotherEpicTask.setEndTime(LocalDateTime.parse((actualTime)).plusMinutes(40));
+        someAnotherEpicTask.setEndTime(dateTime.plusMinutes(40));
         Subtask someAnotherSubtask = new Subtask();
         someAnotherSubtask.setEpic(someAnotherEpicTask);
         someAnotherSubtask.createTitle("Сабтаска эпика 1");
         someAnotherSubtask.setDescription("Описание сабтаски");
         someAnotherSubtask.setStatus(Status.DONE);
-        someAnotherSubtask.setStartTime(LocalDateTime.parse((actualTime)));
+        someAnotherSubtask.setStartTime(dateTime);
         someAnotherSubtask.setDuration(Duration.ofMinutes(15));
         someAnotherEpicTask.addSubtask(someAnotherSubtask);
         manager.addEpicTask(someAnotherEpicTask);
@@ -87,9 +91,9 @@ public class FileTest {
 
         content = Files.readString(tempFile.toPath());
         assertEquals("id,type,name,status,description,duration,startTime,epicId" +
-                        "1, Task, Обычная таска, NEW, Описание таски, 30, " + actualTime +
-                        "2, Epic, Эпическая задача_1, DONE, Это очень важная задача, 15, " + actualTime +
-                        "3, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 15, " + actualTime + ", 2",
+                        "55, Task, Обычная таска, NEW, Описание таски, 30, 2024-01-27T10:30:03" +
+                        "56, Epic, Эпическая задача_1, DONE, Это очень важная задача, 15, 2024-01-27T10:30:03" +
+                        "57, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 15, 2024-01-27T10:30:03, 56",
                 content.replaceAll("\n", "").replaceAll(
                         "\r", ""));
         if (tempFile.exists()) {

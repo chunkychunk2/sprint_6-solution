@@ -6,6 +6,7 @@ import com.yandex.taskmanager.exceptions.ManagerSaveException;
 import com.yandex.taskmanager.model.Epic;
 import com.yandex.taskmanager.model.Subtask;
 import com.yandex.taskmanager.model.Task;
+import com.yandex.taskmanager.model.TaskTypes;
 
 import java.io.*;
 import java.time.Duration;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -50,16 +52,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public Task fromString(String value) {
         String[] taskInfo = value.split(",");
-        String taskType = taskInfo[1].trim();
+        TaskTypes taskType = TaskTypes.valueOf(taskInfo[1].trim().toUpperCase(Locale.ROOT));
         String taskStatus = taskInfo[3].trim();
         switch (taskType) {
-            case "Task":
+            case TASK:
                 return new Task(Integer.parseInt(taskInfo[0]), taskInfo[2], Status.valueOf(taskStatus),
                         taskInfo[4], Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())), LocalDateTime.parse(taskInfo[6].trim()));
-            case "Epic":
+            case EPIC:
+                System.out.println(taskInfo[0] + " " + taskInfo[1] + " " + taskInfo[2] + " " + taskInfo[3] + " " + taskInfo[4] + " " + taskInfo[5] + " " + taskInfo[6]);
                 return new Epic(Integer.parseInt(taskInfo[0]), taskInfo[2],
                         Status.valueOf(taskStatus), taskInfo[4],Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())), LocalDateTime.parse(taskInfo[6].trim()));
-            case "Subtask":
+            case SUBTASK:
                 return new Subtask(Integer.parseInt(taskInfo[0]), taskInfo[2],
                         Status.valueOf(taskStatus), taskInfo[4], Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())),
                         LocalDateTime.parse(taskInfo[6].trim()), Integer.parseInt(taskInfo[7].trim()));
@@ -68,7 +71,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) throws Exception {
+    public static FileBackedTaskManager loadFromFile(File file) throws ManagerLoadException {
         FileBackedTaskManager fromFile = new FileBackedTaskManager(file.toString());
         StringBuilder stringFile = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -97,7 +100,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             return fromFile;
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ManagerLoadException(e.toString());
         } catch (Exception e) {
             throw e;
         }
