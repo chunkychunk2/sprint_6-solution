@@ -107,7 +107,7 @@ class TaskManagerTest <T extends TaskManager> {
         Task update = new Task(task1.getId(), "name2", Status.NEW, "description2", Duration.ofMinutes(15),
                 LocalDateTime.now());
         taskManager.addTask(task1);
-        taskManager.updateTask(update.getId());
+        taskManager.updateTask(update);
         Task updateTask = taskManager.getTaskById(oldTask.getId());
         assertEquals(update, updateTask);
     }
@@ -119,7 +119,7 @@ class TaskManagerTest <T extends TaskManager> {
         taskManager.addEpicTask(task1);
         Epic update = new Epic(task1.getId(), "name2", Status.NEW, "description2", Duration.ofMinutes(15),
                 LocalDateTime.now());
-        taskManager.updateEpicTask(update.getId());
+        taskManager.updateEpicTask(update);
         Task updateTask = taskManager.getEpicTaskById(task1.getId());
         assertEquals(update, updateTask);
     }

@@ -73,6 +73,8 @@ public class InMemoryTaskManager implements TaskManager {
     public void addSubTask(Subtask task) {
         if (!allSubTasks.containsKey(task.getId())) {
             allSubTasks.put(task.getId(), task);
+            Epic epicTask = allEpicTasks.get(task.getEpicId());
+            epicTask.addSubtask(task);
             updateEpicStartTime(task.getEpicId());
             updateEpicEndTime(task.getEpicId());
             updateEpicDuration(task.getEpicId());
@@ -173,34 +175,35 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(int id) {
-        allTasks.put(id, allTasks.get(id));
-        prioritizedTasks.remove(allTasks.get(id));
-        addTaskByPriority(allTasks.get(id));
+    public void updateTask(Task task) {
+        allTasks.put(task.getId(), task);
+        prioritizedTasks.remove(task);
+        addTaskByPriority(task);
     }
 
 
     @Override
-    public void updateSubTask(int id) {
-        Subtask subtask = allSubTasks.get(id);
+    public void updateSubTask(Subtask subtask) {
+        int id = subtask.getId();
         allSubTasks.put(id, subtask);
-        updateEpicStatus(subtask.getEpicId());
-        updateEpicStartTime(subtask.getEpicId());
-        updateEpicEndTime(subtask.getEpicId());
-        updateEpicDuration(subtask.getEpicId());
+        updateEpicStatus(id);
+        updateEpicStartTime(id);
+        updateEpicEndTime(id);
+        updateEpicDuration(id);
         prioritizedTasks.remove(subtask);
         addTaskByPriority(subtask);
     }
 
     @Override
-    public void updateEpicTask(int id) {
-        allEpicTasks.put(id, allEpicTasks.get(id));
+    public void updateEpicTask(Epic epicTask) {
+        int id = epicTask.getId();
+        allEpicTasks.put(id, epicTask);
         updateEpicStatus(id);
         updateEpicStartTime(id);
         updateEpicEndTime(id);
         updateEpicDuration(id);
-        prioritizedTasks.remove(allEpicTasks.get(id));
-        addTaskByPriority(allEpicTasks.get(id));
+        prioritizedTasks.remove(epicTask);
+        addTaskByPriority(epicTask);
     }
 
     @Override
