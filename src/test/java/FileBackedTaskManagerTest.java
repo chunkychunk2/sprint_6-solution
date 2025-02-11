@@ -6,8 +6,6 @@ import com.yandex.taskmanager.model.Epic;
 import com.yandex.taskmanager.model.Subtask;
 import com.yandex.taskmanager.model.Task;
 import com.yandex.taskmanager.service.FileBackedTaskManager;
-import com.yandex.taskmanager.service.InMemoryHistoryManager;
-import com.yandex.taskmanager.service.Managers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
