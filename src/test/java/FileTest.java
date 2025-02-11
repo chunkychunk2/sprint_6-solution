@@ -91,9 +91,9 @@ public class FileTest {
 
         content = Files.readString(tempFile.toPath());
         assertEquals("id,type,name,status,description,duration,startTime,epicId" +
-                        "41, Task, Обычная таска, NEW, Описание таски, 30, 2024-01-27T10:30:03" +
-                        "42, Epic, Эпическая задача_1, DONE, Это очень важная задача, 15, 2024-01-27T10:30:03" +
-                        "43, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 15, 2024-01-27T10:30:03, 42",
+                        "188, Task, Обычная таска, NEW, Описание таски, 30, 2024-01-27T10:30:03" +
+                        "189, Epic, Эпическая задача_1, DONE, Это очень важная задача, 15, 2024-01-27T10:30:03" +
+                        "190, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 15, 2024-01-27T10:30:03, 189",
                 content.replaceAll("\n", "").replaceAll(
                         "\r", ""));
         if (tempFile.exists()) {
