@@ -6,6 +6,8 @@ import com.yandex.taskmanager.service.FileBackedTaskManager;
 import com.yandex.taskmanager.service.Managers;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class Main {
 
@@ -16,15 +18,21 @@ public class Main {
         Task someTask =new Task();
         someTask.createTitle("Обычная таска");
         someTask.setDescription("Описание таски");
+        someTask.setStartTime(LocalDateTime.now());
+        someTask.setDuration(Duration.ofMinutes(30));
         Epic someAnotherEpicTask = new Epic();
         someAnotherEpicTask.createTitle("Эпическая задача_1");
         someAnotherEpicTask.setDescription("Это очень важная задача");
         someAnotherEpicTask.setStatus(Status.IN_PROGRESS);
+        someAnotherEpicTask.setDuration(Duration.ofMinutes(15));
+        someAnotherEpicTask.setStartTime(LocalDateTime.now().plusMinutes(40));
         System.out.println(someAnotherEpicTask);
         Subtask someAnotherSubtask = new Subtask();
         someAnotherSubtask.setEpic(someAnotherEpicTask);
         someAnotherSubtask.createTitle("Сабтаска эпика 1");
         someAnotherSubtask.setDescription("Описание сабтаски");
+        someAnotherSubtask.setStartTime(LocalDateTime.now());
+        someAnotherSubtask.setDuration(Duration.ofMinutes(15));
         someAnotherSubtask.setStatus(Status.DONE);
         manager.addEpicTask(someAnotherEpicTask);
         manager.addSubTask(someAnotherSubtask);
