@@ -34,20 +34,5 @@ public class Main {
         manager.addEpicTask(someAnotherEpicTask);
         manager.addSubTask(someAnotherSubtask);
         manager.addTask(someTask);
-        System.out.println(someAnotherSubtask);
-        System.out.println(someAnotherEpicTask);
-    }
-
-
-    private static void printAllTasks(TaskManager manager) {
-        System.out.println("Задачи:");
-        System.out.println(manager.getAllTasks());
-        System.out.println("Эпики:");
-        System.out.println(manager.getAllEpicTasks());
-        System.out.println("Подзадачи:");
-        System.out.println(manager.getAllSubTasks());
-
-        System.out.println("История:");
-        System.out.println(manager.getHistory());
     }
 }

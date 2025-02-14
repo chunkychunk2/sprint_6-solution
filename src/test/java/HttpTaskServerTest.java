@@ -168,7 +168,7 @@ class HttpTaskServerTest {
         HttpClient client = HttpClient.newHttpClient();
         URI uriTasks = URI.create("http://localhost:8080/subtasks");
         Subtask task = new Subtask(876, "name2", Status.NEW, "description2", Duration.ofMinutes(15),
-                LocalDateTime.now());
+                LocalDateTime.now(),epicTask.getId());
 
         HttpResponse<String> responsePostTask = sendPostTask(client, uriTasks, task);
         List<Subtask> actual = taskManager.getAllSubTasks();
@@ -220,7 +220,11 @@ epic.setEndTime(LocalDateTime.now());
         HttpClient client = HttpClient.newHttpClient();
         Epic epic = new Epic(23, "name1", Status.NEW, "description", Duration.ofMinutes(15),
                 LocalDateTime.now());
+        Subtask subtask = new Subtask(19, "name2", Status.NEW, "description2", Duration.ofMinutes(15),
+                LocalDateTime.now(), epic.getId());
+        epic.addSubtask(subtask);
         taskManager.addEpicTask(epic);
+        taskManager.addSubTask(subtask);
         URI uriTasks = URI.create("http://localhost:8080/epics/" + epic.getId());
 
         HttpResponse<String> responsePostTask = sendDeleteTask(client, uriTasks);

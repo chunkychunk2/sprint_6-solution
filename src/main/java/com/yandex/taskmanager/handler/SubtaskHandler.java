@@ -1,55 +1,103 @@
 package com.yandex.taskmanager.handler;
 
+import com.google.gson.Gson;
+import com.google.gson.internal.bind.util.ISO8601Utils;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.yandex.taskmanager.Status;
 import com.yandex.taskmanager.TaskManager;
-import com.yandex.taskmanager.model.Epic;
 import com.yandex.taskmanager.model.Subtask;
-import com.yandex.taskmanager.model.Task;
-import com.yandex.taskmanager.service.Managers;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.time.Duration;
-import java.time.LocalDateTime;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
-public class SubtaskHandler implements HttpHandler {
+public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
+
+    private final TaskManager taskManager;
+    private final Gson gson;
+
+    public SubtaskHandler(TaskManager taskManager, Gson gson) {
+        this.taskManager = taskManager;
+        this.gson = gson;
+    }
 
     @Override
-    public void handle(HttpExchange httpExchange) throws IOException {
-        // формируем ответ клиенту в виде простой строки и кода ответа 200
+    public void handle(HttpExchange exchange) {
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+        String[] pathParts = path.split("/");
+        try {
+            switch (method) {
+                case "GET" -> {
+                    if (pathParts.length == 3) {
+                        handleGetSubtaskById(exchange, pathParts[2]);
+                    } else if (pathParts.length == 2) {
+                        handleGetAllSubtasks(exchange);
+                    } else {
+                        sendNotFound(exchange);
+                    }
+                }
+                case "POST" -> handlePostSubtask(exchange);
+                case "DELETE" -> {
+                    if (pathParts.length == 3) {
+                        handleDeleteSubtaskById(exchange, pathParts[2]);
+                    } else {
+                        sendNotFound(exchange);
+                    }
+                }
+                default -> sendText(exchange, "Метод не поддерживается", 400);
+            }
+        } catch (Exception e) {
+            sendServerError(exchange, e.getMessage());
+        }
+    }
 
-        // устанавливаем код ответа и отправляем его вместе с заголовками по умолчанию
-        httpExchange.sendResponseHeaders(200, 0);
+    private void handleGetAllSubtasks(HttpExchange exchange) {
+        try {
+            String response = gson.toJson(taskManager.getAllSubTasks());
+            sendText(exchange, response, 200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendNotFound(exchange);
+        }
+    }
 
-        TaskManager manager = Managers.getDefault("src/main/resources/tasks_info.csv");
-        Task someTask =new Task();
-        someTask.setTitle("Обычная таска");
-        someTask.setDescription("Описание таски");
-        someTask.setStartTime(LocalDateTime.now());
-        someTask.setDuration(Duration.ofMinutes(30));
-        Epic someAnotherEpicTask = new Epic();
-        someAnotherEpicTask.setTitle("Эпическая задача_1");
-        someAnotherEpicTask.setDescription("Это очень важная задача");
-        someAnotherEpicTask.setStatus(Status.IN_PROGRESS);
-        someAnotherEpicTask.setDuration(Duration.ofMinutes(15));
-        someAnotherEpicTask.setStartTime(LocalDateTime.now().plusMinutes(40));
-        System.out.println(someAnotherEpicTask);
-        Subtask someAnotherSubtask = new Subtask();
-        someAnotherSubtask.setEpic(someAnotherEpicTask);
-        someAnotherSubtask.setTitle("Сабтаска эпика 1");
-        someAnotherSubtask.setDescription("Описание сабтаски");
-        someAnotherSubtask.setStartTime(LocalDateTime.now());
-        someAnotherSubtask.setDuration(Duration.ofMinutes(15));
-        someAnotherSubtask.setStatus(Status.DONE);
-        manager.addEpicTask(someAnotherEpicTask);
-        manager.addSubTask(someAnotherSubtask);
-        manager.addTask(someTask);
+    private void handleGetSubtaskById(HttpExchange exchange, String taskIdStr) {
+        try {
+            int subTaskId = Integer.parseInt(taskIdStr);
+            Subtask subTask = taskManager.getSubTaskById(subTaskId);
+            if (subTask == null) {
+                sendNotFound(exchange);
+            } else {
+                String response = gson.toJson(subTask);
+                sendText(exchange, response, 200);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendNotFound(exchange);
+        }
+    }
 
-        String response = String.valueOf(manager.getAllSubTasks());
-        try (OutputStream os = httpExchange.getResponseBody()) {
-            os.write(response.getBytes());
+    private void handlePostSubtask(HttpExchange exchange) {
+        try {
+            InputStreamReader inputReader = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
+            Subtask task = gson.fromJson(inputReader, Subtask.class);
+            taskManager.addSubTask(task);
+            sendText(exchange, "Задача добавлена", 201);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendHasInteractions(exchange);
+        }
+    }
+
+    private void handleDeleteSubtaskById(HttpExchange exchange, String taskIdStr) {
+        try {
+            int subTaskId = Integer.parseInt(taskIdStr);
+            taskManager.deleteSubTask(subTaskId);
+            sendText(exchange, "Задача удалена", 204);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendNotFound(exchange);
         }
     }
 }

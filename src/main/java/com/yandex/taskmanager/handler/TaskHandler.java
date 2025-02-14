@@ -1,111 +1,100 @@
 package com.yandex.taskmanager.handler;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.yandex.taskmanager.TaskManager;
 import com.yandex.taskmanager.model.Task;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
-public class TaskHandler implements HttpHandler {
+public class TaskHandler  extends BaseHttpHandler implements HttpHandler {
+    private final TaskManager taskManager;
+    private final Gson gson;
 
-    private TaskManager taskManager;
-
-    public TaskHandler(TaskManager taskManager) {
+    public TaskHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
+        this.gson = gson;
     }
 
     @Override
-    public void handle(HttpExchange httpExchange) throws IOException {
-
-        String path = httpExchange.getRequestURI().getPath();
-        System.out.println(path);
-        // а из path — профессию и имя
-        String[] pathParams = path.split("/");
-        int nestingLevel = pathParams.length;
-
-        String method = httpExchange.getRequestMethod();
-        System.out.println("Началась обработка " + method + " /tasks запроса от клиента.");
-
-        String response;
-
-        int statusCode;
-
-        switch (method) {
-            case "POST":
-                response = handlePostTaskRequest(taskManager, httpExchange);
-                statusCode = 201;
-                break;
-            case "GET":
-                if (nestingLevel == 3) {
-                    response = handleGetTaskRequest(taskManager, pathParams[2]);
-                    statusCode = 200;
-                } else if (nestingLevel == 2) {
-                    response = handleGetAllTasksRequest(taskManager);
-                    statusCode = 200;
-                } else {
-                    response = null;
-                    statusCode = 404;
+    public void handle(HttpExchange exchange) {
+        String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
+        String[] pathParts = path.split("/");
+        try {
+            switch (method) {
+                case "GET" -> {
+                    if (pathParts.length == 3) {
+                        handleGetTaskById(exchange, pathParts[2]);
+                    } else if (pathParts.length == 2) {
+                        handleGetAllTasks(exchange);
+                    } else {
+                        sendNotFound(exchange);
+                    }
                 }
-                break;
-            case "DELETE":
-                if (nestingLevel == 3) {
-                    response = handleDeleteTaskRequest(taskManager, pathParams[2]);
-                    statusCode = 200;
-                } else if (nestingLevel == 2) {
-                    response = handleDeleteAllTasksRequest(taskManager);
-                    statusCode = 200;
-                } else {
-                    response = null;
-                    statusCode = 404;
+                case "POST" -> handlePostTask(exchange);
+                case "DELETE" -> {
+                    if (pathParts.length == 3) {
+                        handleDeleteTaskById(exchange, pathParts[2]);
+                    } else {
+                        sendNotFound(exchange);
+                    }
                 }
-                break;
-            default:
-                response = "Вы использовали какой-то другой метод!";
-                statusCode = 404;
-        }
-
-        httpExchange.sendResponseHeaders(statusCode, 0);
-
-        try (OutputStream os = httpExchange.getResponseBody()) {
-            os.write(response.getBytes());
+                default -> sendText(exchange, "Метод не поддерживается", 404);
+            }
+        } catch (Exception e) {
+            sendServerError(exchange, e.getMessage());
         }
     }
 
-    private static String handleGetTaskRequest(TaskManager taskManager, String pathParam) {
-        int taskId = Integer.parseInt(pathParam);
-        return String.valueOf(taskManager.getTaskById(taskId));
+    private void handleGetAllTasks(HttpExchange exchange) {
+        try {
+            String response = gson.toJson(taskManager.getAllTasks());
+            sendText(exchange, response, 200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendNotFound(exchange);
+        }
     }
 
-    private static String handleGetAllTasksRequest(TaskManager taskManager) {
-        return String.valueOf(taskManager.getAllTasks());
+    private void handleGetTaskById(HttpExchange exchange, String taskIdStr) {
+        try {
+            int taskId = Integer.parseInt(taskIdStr);
+            Task task = taskManager.getTaskById(taskId);
+            if (task == null) {
+                sendNotFound(exchange);
+            } else {
+                String response = gson.toJson(task);
+                sendText(exchange, response, 200);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendNotFound(exchange);
+        }
     }
 
-    private static String handleDeleteTaskRequest(TaskManager taskManager, String pathParam) {
-        int taskId = Integer.parseInt(pathParam);
-        taskManager.deleteTask(taskId);
-        return "Задача id:" + taskId + " удалена";
+    private void handlePostTask(HttpExchange exchange) {
+        try {
+            InputStreamReader inputReader = new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8);
+            Task task = gson.fromJson(inputReader, Task.class);
+            taskManager.addTask(task);
+            sendText(exchange, "Задача добавлена", 201);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendHasInteractions(exchange);
+        }
     }
 
-    private static String handleDeleteAllTasksRequest(TaskManager taskManager) {
-        taskManager.deleteAllTasks();
-        return "Все задачи удалены";
-    }
-
-    private static String handlePostTaskRequest(TaskManager taskManager, HttpExchange httpExchange) throws IOException {
-        InputStream inputStream = httpExchange.getRequestBody();
-        String name = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        Task someTask = new Task();
-        someTask.setTitle(name);
-        someTask.setDescription("Таска создалась методом POST");
-        someTask.setStartTime(LocalDateTime.now());
-        someTask.setDuration(Duration.ofMinutes(30));
-        taskManager.addTask(someTask);
-        return "Задача создана успешно";
+    private void handleDeleteTaskById(HttpExchange exchange, String taskIdStr) {
+        try {
+            int taskId = Integer.parseInt(taskIdStr);
+            taskManager.deleteTask(taskId);
+            sendText(exchange, "Задача удалена", 204);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sendNotFound(exchange);
+        }
     }
 }

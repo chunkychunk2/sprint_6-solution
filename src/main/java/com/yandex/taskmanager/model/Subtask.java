@@ -1,5 +1,6 @@
 package com.yandex.taskmanager.model;
 
+import com.google.gson.annotations.Expose;
 import com.yandex.taskmanager.Status;
 
 import java.time.Duration;
@@ -7,7 +8,7 @@ import java.time.LocalDateTime;
 
 public class Subtask extends Task {
 
-    private Epic epic;
+    private transient Epic epic;
 
     private Integer epicId;
 

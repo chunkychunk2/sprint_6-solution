@@ -56,15 +56,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String taskStatus = taskInfo[3].trim();
         switch (taskType) {
             case TASK:
-                return new Task(Integer.parseInt(taskInfo[0]), taskInfo[2], Status.valueOf(taskStatus),
-                        taskInfo[4], Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())), LocalDateTime.parse(taskInfo[6].trim()));
+                return new Task(Integer.parseInt(taskInfo[0]), taskInfo[2].trim(), Status.valueOf(taskStatus),
+                        taskInfo[4].trim(), Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())),
+                        LocalDateTime.parse(taskInfo[6].trim()));
             case EPIC:
-                System.out.println(taskInfo[0] + " " + taskInfo[1] + " " + taskInfo[2] + " " + taskInfo[3] + " " + taskInfo[4] + " " + taskInfo[5] + " " + taskInfo[6]);
-                return new Epic(Integer.parseInt(taskInfo[0]), taskInfo[2],
-                        Status.valueOf(taskStatus), taskInfo[4],Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())), LocalDateTime.parse(taskInfo[6].trim()));
+                return new Epic(Integer.parseInt(taskInfo[0]), taskInfo[2].trim(),
+                        Status.valueOf(taskStatus), taskInfo[4].trim(),
+                        Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())), LocalDateTime.parse(taskInfo[6].trim()));
             case SUBTASK:
-                return new Subtask(Integer.parseInt(taskInfo[0]), taskInfo[2],
-                        Status.valueOf(taskStatus), taskInfo[4], Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())),
+                return new Subtask(Integer.parseInt(taskInfo[0]), taskInfo[2].trim(),
+                        Status.valueOf(taskStatus), taskInfo[4].trim(),
+                        Duration.ofMinutes(Long.parseLong(taskInfo[5].trim())),
                         LocalDateTime.parse(taskInfo[6].trim()), Integer.parseInt(taskInfo[7].trim()));
             default:
                 throw new ManagerLoadException("Ошибка чтения записи: " + Arrays.toString(taskInfo));

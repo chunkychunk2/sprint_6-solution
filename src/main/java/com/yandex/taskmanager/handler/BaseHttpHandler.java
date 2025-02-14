@@ -5,7 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public abstract class BaseHttpHandler {
+public class BaseHttpHandler {
 
     protected void sendText(HttpExchange exchange, String text, int statusCode) {
         try (exchange) {
@@ -25,11 +25,11 @@ public abstract class BaseHttpHandler {
     }
 
     protected void sendNotFound(HttpExchange exchange) {
-        sendText(exchange, "Не найдено", 404);
+        sendText(exchange, "Объект не найден", 404);
     }
 
     protected void sendHasInteractions(HttpExchange exchange) {
-        sendText(exchange, "Нельяза добавить или обновить", 406);
+        sendText(exchange, "Задача пересекается с уже существующими!", 406);
     }
 
     protected void sendServerError(HttpExchange exchange, String errorMessage) {

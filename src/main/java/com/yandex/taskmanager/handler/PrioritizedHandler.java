@@ -22,8 +22,7 @@ public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
             if (method.equals("GET")) {
                 handleGetPrioritized(exchange);
             } else {
-                sendText(exchange, "Метод " + method + " некорректный, необходимо передать GET запрос",
-                        404);
+                sendText(exchange, "Метод не поддерживается", 404);
             }
         } catch (Exception e) {
             sendServerError(exchange, e.getMessage());
