@@ -17,7 +17,7 @@ public class Subtask extends Task {
 
     public Subtask(int id, String title, Status status, String description, int epicId) {
         setId(id);
-        createTitle(title);
+        setTitle(title);
         setStatus(status);
         setDescription(description);
         setTaskType(TaskTypes.SUBTASK);
@@ -27,7 +27,7 @@ public class Subtask extends Task {
     public Subtask(int id, String title, Status status, String description,
                    Duration duration, LocalDateTime startTime, int epicId) {
         setId(id);
-        createTitle(title);
+        setTitle(title);
         setStatus(status);
         setDescription(description);
         setTaskType(TaskTypes.SUBTASK);
@@ -39,7 +39,7 @@ public class Subtask extends Task {
     public Subtask(int id, String title, Status status, String description,
                    Duration duration, LocalDateTime startTime) {
         setId(id);
-        createTitle(title);
+        setTitle(title);
         setStatus(status);
         setDescription(description);
         setTaskType(TaskTypes.SUBTASK);

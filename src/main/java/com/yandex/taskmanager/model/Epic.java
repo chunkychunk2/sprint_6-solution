@@ -5,6 +5,7 @@ import com.yandex.taskmanager.Status;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Epic extends Task {
 
@@ -19,7 +20,7 @@ public class Epic extends Task {
 
     public Epic(int id, String title, Status status, String description) {
         setId(id);
-        createTitle(title);
+        setTitle(title);
         setStatus(status);
         setDescription(description);
         subtasks = new ArrayList<>();
@@ -29,7 +30,7 @@ public class Epic extends Task {
     public Epic(int id, String title, Status status, String description,
                 Duration duration, LocalDateTime startTime) {
         setId(id);
-        createTitle(title);
+        setTitle(title);
         setStatus(status);
         setDescription(description);
         subtasks = new ArrayList<>();
@@ -73,6 +74,14 @@ public class Epic extends Task {
 
     @Override
     public LocalDateTime getEndTime() {
+        if (endTime == null) {
+            // Вычисляем endTime на основе подзадач
+            endTime = subtasks.stream()
+                    .map(Subtask::getEndTime)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(null);
+        }
         return endTime;
     }
 

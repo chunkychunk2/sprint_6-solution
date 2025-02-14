@@ -22,7 +22,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public void add(Task task) {
         Task taskCopy = new Task();
         taskCopy.setId(task.getId());
-        taskCopy.createTitle(task.getTitle());
+        taskCopy.setTitle(task.getTitle());
         taskCopy.setDescription(task.getDescription());
         taskCopy.setStatus(task.getStatus());
         remove(task.getId());

@@ -307,7 +307,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     private LocalDateTime calculateEpicEndTime(List<Subtask> subTasks) {
         return subTasks.stream()
-                .map(Task::getEndTime)
+                .map(Subtask::getEndTime)
                 .max(Comparator.naturalOrder()).orElse(null);
     }
 

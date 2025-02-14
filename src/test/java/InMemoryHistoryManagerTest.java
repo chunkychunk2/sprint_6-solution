@@ -18,7 +18,7 @@ public class InMemoryHistoryManagerTest {
     @Test
     void whenAddTask() {
         Task task = new Task();
-        task.createTitle("Задача-1");
+        task.setTitle("Задача-1");
         HistoryManager historyManager = new InMemoryHistoryManager();
         historyManager.add(task);
         List<Task> history = historyManager.getHistory();
@@ -28,7 +28,7 @@ public class InMemoryHistoryManagerTest {
     @Test
     void whenAddCopyTask() {
         Task task = new Task();
-        task.createTitle("Задача-1");
+        task.setTitle("Задача-1");
         HistoryManager historyManager = new InMemoryHistoryManager();
         historyManager.add(task);
         historyManager.add(task);
@@ -42,7 +42,7 @@ public class InMemoryHistoryManagerTest {
         Task task = new Task();
         HistoryManager historyManager = new InMemoryHistoryManager();
         historyManager.add(task);
-        task.createTitle("Задача-новая");
+        task.setTitle("Задача-новая");
         historyManager.add(task);
         List<Task> history = historyManager.getHistory();
         assertEquals(1, history.size());
@@ -55,9 +55,9 @@ public class InMemoryHistoryManagerTest {
         Task task1 = new Task();
         Task task2 = new Task();
         Task task3 = new Task();
-        task1.createTitle("Задача-1");
-        task2.createTitle("Задача-2");
-        task3.createTitle("Задача-3");
+        task1.setTitle("Задача-1");
+        task2.setTitle("Задача-2");
+        task3.setTitle("Задача-3");
         HistoryManager historyManager = new InMemoryHistoryManager();
         historyManager.add(task1);
         historyManager.add(task2);

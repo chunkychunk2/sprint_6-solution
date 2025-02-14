@@ -166,6 +166,9 @@ class TaskManagerTest <T extends TaskManager> {
                 LocalDateTime.now(), epic.getId());
         epic.addSubtask(task1);
         epic.addSubtask(task2);
+        System.out.println(epic);
+        System.out.println(task1);
+        System.out.println(task2);
         taskManager.addEpicTask(epic);
         taskManager.addSubTask(task1);
         taskManager.addSubTask(task2);

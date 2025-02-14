@@ -211,7 +211,7 @@ class TaskTest {
     @Test
     void TaskTestAfterAddingToManager() throws IOException {
         Task task = new Task();
-        task.createTitle("Таска");
+        task.setTitle("Таска");
         task.setDescription("Описание");
         task.setStatus(Status.IN_PROGRESS);
         int id = task.getId();
@@ -234,7 +234,7 @@ class TaskTest {
         assertEquals("", content);
         TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
-        task.createTitle("Test addNewTask");
+        task.setTitle("Test addNewTask");
         task.setDescription("Test addNewTask description");
         task.setStatus(Status.NEW);
         task.setDuration(Duration.ofMinutes(15));
@@ -341,12 +341,12 @@ class TaskTest {
         Task task = new Task();
         task.setDuration(Duration.ofMinutes(15));
         manager.addTask(task);
-        task.createTitle("Таска_версия_1");
+        task.setTitle("Таска_версия_1");
         manager.getTaskById(task.getId());
         assertEquals("Таска_версия_1", manager.getHistory().get(0).getTitle());
-        task.createTitle("Таска_версия_2");
+        task.setTitle("Таска_версия_2");
         manager.getTaskById(task.getId());
-        task.createTitle("Таска_версия_3");
+        task.setTitle("Таска_версия_3");
         assertEquals("Таска_версия_2", manager.getHistory().get(0).getTitle());
     }
 
