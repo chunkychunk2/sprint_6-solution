@@ -32,11 +32,11 @@ public interface TaskManager {
 
     Epic getEpicTaskById(int id);
 
-    void updateTask(int task);
+    void updateTask(Task task);
 
-    void updateSubTask(int task);
+    void updateSubTask(Subtask task);
 
-    void updateEpicTask(int task);
+    void updateEpicTask(Epic task);
 
     void deleteTask(int id);
 
@@ -51,5 +51,9 @@ public interface TaskManager {
     void changeStatus();
 
     List<Task> getHistory();
+
+    boolean isTaskOverlap(Task task);
+
+    List<Task> getPrioritizedTasks();
 
 }

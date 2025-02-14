@@ -4,20 +4,123 @@ import com.yandex.taskmanager.model.Subtask;
 import com.yandex.taskmanager.model.Task;
 import com.yandex.taskmanager.service.FileBackedTaskManager;
 import com.yandex.taskmanager.service.InMemoryHistoryManager;
-import com.yandex.taskmanager.service.InMemoryTaskManager;
 import com.yandex.taskmanager.service.Managers;
+import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TaskTest {
+
+    @Test
+    void checkEpicStatusWithSubtasksWithNEWStatus() throws Exception {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
+        Epic epic = new Epic();
+        epic.setStatus(Status.IN_PROGRESS);
+        epic.setDuration(Duration.ofMinutes(15));
+        epic.setStartTime(LocalDateTime.now());
+        Subtask subtask = new Subtask();
+        subtask.setDuration(Duration.ofMinutes(15));
+        subtask.setStartTime(LocalDateTime.now());
+        Subtask subtask2 = new Subtask();
+        subtask2.setDuration(Duration.ofMinutes(15));
+        subtask2.setStartTime(LocalDateTime.now());
+        epic.addSubtask(subtask);
+        epic.addSubtask(subtask2);
+        manager.addEpicTask(epic);
+        manager.addSubTask(subtask);
+        manager.addSubTask(subtask2);
+        Assert.assertEquals(Status.NEW, epic.getStatus());
+    }
+
+    @Test
+    void checkEpicStatusWithSubtasksWithDONEStatus() throws Exception {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
+        Epic epic = new Epic();
+        epic.setStatus(Status.IN_PROGRESS);
+        epic.setStartTime(LocalDateTime.now());
+        epic.setDuration(Duration.ofMinutes(15));
+        Subtask subtask = new Subtask();
+        subtask.setDuration(Duration.ofMinutes(15));
+        subtask.setStartTime(LocalDateTime.now());
+        Subtask subtask2 = new Subtask();
+        subtask2.setDuration(Duration.ofMinutes(15));
+        subtask2.setStartTime(LocalDateTime.now());
+        epic.addSubtask(subtask);
+        epic.addSubtask(subtask2);
+        subtask.changeStatus(Status.DONE);
+        subtask2.changeStatus(Status.DONE);
+        manager.addEpicTask(epic);
+        manager.addSubTask(subtask);
+        manager.addSubTask(subtask2);
+        Assert.assertEquals(Status.DONE, epic.getStatus());
+    }
+
+    @Test
+    void checkEpicStatusWithSubtasksWithNEWAndDONEStatuses() throws Exception {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
+        Epic epic = new Epic();
+        epic.setStatus(Status.IN_PROGRESS);
+        epic.setDuration(Duration.ofMinutes(15));
+        epic.setStartTime(LocalDateTime.now());
+        Subtask subtask = new Subtask();
+        subtask.setDuration(Duration.ofMinutes(15));
+        subtask.setStartTime(LocalDateTime.now());
+        Subtask subtask2 = new Subtask();
+        subtask2.setDuration(Duration.ofMinutes(15));
+        subtask2.setStartTime(LocalDateTime.now());
+        epic.addSubtask(subtask);
+        epic.addSubtask(subtask2);
+        subtask2.changeStatus(Status.DONE);
+        manager.addEpicTask(epic);
+        manager.addSubTask(subtask);
+        manager.addSubTask(subtask2);
+        Assert.assertEquals(Status.IN_PROGRESS, epic.getStatus());
+    }
+
+    @Test
+    void checkEpicStatusWithSubtasksWithINPROGRESSStatus() throws Exception {
+        File tempFile = File.createTempFile("testFile", ".txt");
+        String content = Files.readString(tempFile.toPath());
+        assertEquals("", content);
+        TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
+        Epic epic = new Epic();
+        epic.setStatus(Status.IN_PROGRESS);
+        epic.setDuration(Duration.ofMinutes(15));
+        epic.setStartTime(LocalDateTime.now());
+        Subtask subtask = new Subtask();
+        subtask.setDuration(Duration.ofMinutes(15));
+        subtask.setStartTime(LocalDateTime.now());
+        Subtask subtask2 = new Subtask();
+        subtask2.setDuration(Duration.ofMinutes(15));
+        subtask2.setStartTime(LocalDateTime.now());
+        epic.addSubtask(subtask);
+        epic.addSubtask(subtask2);
+        subtask.changeStatus(Status.IN_PROGRESS);
+        subtask2.changeStatus(Status.IN_PROGRESS);
+        manager.addEpicTask(epic);
+        manager.addSubTask(subtask);
+        manager.addSubTask(subtask2);
+        Assert.assertEquals(Status.IN_PROGRESS, epic.getStatus());
+    }
 
     @Test
     void isTasksEquals() {
@@ -59,6 +162,7 @@ class TaskTest {
         assertEquals(manager.getClass(), FileBackedTaskManager.class);
         assertEquals(historyManager.getClass(), InMemoryHistoryManager.class);
         Task task = new Task();
+        task.setDuration(Duration.ofMinutes(15));
         manager.addTask(task);
         manager.getTaskById(task.getId());
         assertFalse(manager.getHistory().isEmpty());
@@ -72,7 +176,14 @@ class TaskTest {
         TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
         Epic epic = new Epic();
+        task.setDuration(Duration.ofMinutes(15));
+        task.setStartTime(LocalDateTime.now());
+        epic.setDuration(Duration.ofMinutes(15));
+        epic.setStartTime(LocalDateTime.now());
         Subtask subtask = new Subtask();
+        subtask.setDuration(Duration.ofMinutes(15));
+        subtask.setStartTime(LocalDateTime.now());
+        epic.addSubtask(subtask);
         manager.addTask(task);
         manager.addEpicTask(epic);
         manager.addSubTask(subtask);
@@ -85,6 +196,8 @@ class TaskTest {
     void CreatedAndGeneratedIdsTest() throws IOException {
         Task task = new Task();
         Task task2 = new Task();
+        task.setDuration(Duration.ofMinutes(15));
+        task2.setDuration(Duration.ofMinutes(15));
         task2.setId(task.getId());
         File tempFile = File.createTempFile("testFile", ".txt");
         String content = Files.readString(tempFile.toPath());
@@ -98,7 +211,7 @@ class TaskTest {
     @Test
     void TaskTestAfterAddingToManager() throws IOException {
         Task task = new Task();
-        task.createTitle("Таска");
+        task.setTitle("Таска");
         task.setDescription("Описание");
         task.setStatus(Status.IN_PROGRESS);
         int id = task.getId();
@@ -106,6 +219,7 @@ class TaskTest {
         String content = Files.readString(tempFile.toPath());
         assertEquals("", content);
         TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
+        task.setDuration(Duration.ofMinutes(15));
         manager.addTask(task);
         assertEquals("Таска", task.getTitle());
         assertEquals("Описание", task.getDescription());
@@ -120,9 +234,10 @@ class TaskTest {
         assertEquals("", content);
         TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
-        task.createTitle("Test addNewTask");
+        task.setTitle("Test addNewTask");
         task.setDescription("Test addNewTask description");
         task.setStatus(Status.NEW);
+        task.setDuration(Duration.ofMinutes(15));
         manager.addTask(task);
 
         int taskId = task.getId();
@@ -156,9 +271,14 @@ class TaskTest {
     void checkDeletedSubtasksId() throws IOException {
         Epic epic = new Epic();
         Subtask subtask = new Subtask();
+        epic.setDuration(Duration.ofMinutes(15));
+        epic.setStartTime(LocalDateTime.now());
+        subtask.setDuration(Duration.ofMinutes(15));
+        subtask.setStartTime(LocalDateTime.now());
         File tempFile = File.createTempFile("testFile", ".txt");
         String content = Files.readString(tempFile.toPath());
         assertEquals("", content);
+        epic.addSubtask(subtask);
         TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         taskManager.addEpicTask(epic);
         taskManager.addSubTask(subtask);
@@ -173,9 +293,14 @@ class TaskTest {
     void checkDeletedSubtasksIdInEpic() throws IOException {
         Epic epic = new Epic();
         Subtask subtask = new Subtask();
+        epic.setDuration(Duration.ofMinutes(15));
+        epic.setStartTime(LocalDateTime.now());
+        subtask.setDuration(Duration.ofMinutes(15));
+        subtask.setStartTime(LocalDateTime.now());
         File tempFile = File.createTempFile("testFile", ".txt");
         String content = Files.readString(tempFile.toPath());
         assertEquals("", content);
+        epic.addSubtask(subtask);
         TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         taskManager.addEpicTask(epic);
         taskManager.addSubTask(subtask);
@@ -193,6 +318,8 @@ class TaskTest {
         TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
         Task task2 = new Task();
+        task.setDuration(Duration.ofMinutes(15));
+        task2.setDuration(Duration.ofMinutes(15));
         taskManager.addTask(task);
         taskManager.addTask(task2);
         taskManager.getTaskById(task.getId());
@@ -212,13 +339,14 @@ class TaskTest {
         assertEquals("", content);
         TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
+        task.setDuration(Duration.ofMinutes(15));
         manager.addTask(task);
-        task.createTitle("Таска_версия_1");
+        task.setTitle("Таска_версия_1");
         manager.getTaskById(task.getId());
         assertEquals("Таска_версия_1", manager.getHistory().get(0).getTitle());
-        task.createTitle("Таска_версия_2");
+        task.setTitle("Таска_версия_2");
         manager.getTaskById(task.getId());
-        task.createTitle("Таска_версия_3");
+        task.setTitle("Таска_версия_3");
         assertEquals("Таска_версия_2", manager.getHistory().get(0).getTitle());
     }
 
@@ -232,8 +360,20 @@ class TaskTest {
         Task task2 = new Task();
         Epic epic = new Epic();
         Epic epic2 = new Epic();
+        task.setDuration(Duration.ofMinutes(15));
+        task.setStartTime(LocalDateTime.now());
+        task2.setDuration(Duration.ofMinutes(15));
+        task2.setStartTime(LocalDateTime.now());
+        epic.setDuration(Duration.ofMinutes(15));
+        epic.setStartTime(LocalDateTime.now());
+        epic2.setDuration(Duration.ofMinutes(15));
+        epic2.setStartTime(LocalDateTime.now());
         Subtask subtask = new Subtask();
         Subtask subtask2 = new Subtask();
+        subtask.setDuration(Duration.ofMinutes(15));
+        subtask.setStartTime(LocalDateTime.now());
+        subtask2.setDuration(Duration.ofMinutes(15));
+        subtask2.setStartTime(LocalDateTime.now());
         epic.addSubtask(subtask);
         epic2.addSubtask(subtask2);
         taskManager.addTask(task);
@@ -250,9 +390,6 @@ class TaskTest {
         taskManager.getSubTaskById(subtask2.getId());
         taskManager.getTaskById(task.getId());
         List<Task> history = taskManager.getHistory();
-
-        System.out.println(history);
-        System.out.println(task);
         assertEquals(task.getId(), history.get(history.size() - 1).getId());
     }
 
@@ -263,6 +400,7 @@ class TaskTest {
         assertEquals("", content);
         TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         Task task = new Task();
+        task.setDuration(Duration.ofMinutes(15));
         taskManager.addTask(task);
         taskManager.getTaskById(task.getId());
         assertEquals(1, taskManager.getHistory().size());
@@ -277,9 +415,17 @@ class TaskTest {
         assertEquals("", content);
         TaskManager taskManager = Managers.getDefault(tempFile.toPath().toString());
         Epic epic = new Epic();
+        epic.setDuration(Duration.ofMinutes(30));
+        epic.setStartTime(LocalDateTime.now());
         Subtask subtask = new Subtask();
         Subtask subtask2 = new Subtask();
         Subtask subtask3 = new Subtask();
+        subtask.setDuration(Duration.ofMinutes(15));
+        subtask2.setDuration(Duration.ofMinutes(15));
+        subtask3.setDuration(Duration.ofMinutes(15));
+        subtask.setStartTime(LocalDateTime.now());
+        subtask2.setStartTime(LocalDateTime.now());
+        subtask3.setStartTime(LocalDateTime.now());
         epic.addSubtask(subtask);
         epic.addSubtask(subtask2);
         epic.addSubtask(subtask3);
@@ -296,5 +442,9 @@ class TaskTest {
         assertEquals(0, taskManager.getHistory().size());
     }
 
-
+    @Test
+    void whenEmptyHistory() {
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        assertTrue(historyManager.getHistory().isEmpty());
+    }
 }

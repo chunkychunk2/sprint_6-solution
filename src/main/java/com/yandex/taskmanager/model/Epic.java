@@ -2,11 +2,16 @@ package com.yandex.taskmanager.model;
 
 import com.yandex.taskmanager.Status;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Epic extends Task {
 
     private final ArrayList<Subtask> subtasks;
+
+    private LocalDateTime endTime;
 
     public Epic() {
         subtasks = new ArrayList<>();
@@ -15,11 +20,23 @@ public class Epic extends Task {
 
     public Epic(int id, String title, Status status, String description) {
         setId(id);
-        createTitle(title);
+        setTitle(title);
         setStatus(status);
         setDescription(description);
         subtasks = new ArrayList<>();
         setTaskType(TaskTypes.EPIC);
+    }
+
+    public Epic(int id, String title, Status status, String description,
+                Duration duration, LocalDateTime startTime) {
+        setId(id);
+        setTitle(title);
+        setStatus(status);
+        setDescription(description);
+        subtasks = new ArrayList<>();
+        setTaskType(TaskTypes.EPIC);
+        setDuration(duration);
+        setStartTime(startTime);
     }
 
     public void deleteSubtask(Subtask subtask) {
@@ -51,11 +68,30 @@ public class Epic extends Task {
             }
         }
         if (result) setStatus(Status.DONE);
+        else setStatus(Status.IN_PROGRESS);
         return result;
     }
 
     @Override
+    public LocalDateTime getEndTime() {
+        if (endTime == null) {
+            // Вычисляем endTime на основе подзадач
+            endTime = subtasks.stream()
+                    .map(Subtask::getEndTime)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(null);
+        }
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
     public String toString() {
-        return getId() + ", Epic, " + getTitle() + ", " + getStatus() + ", " + getDescription();
+        return getId() + ", Epic, " + getTitle() + ", " + getStatus()
+                + ", " + getDescription() + ", " + getDuration().toMinutes() + ", " + getStartTime();
     }
 }
