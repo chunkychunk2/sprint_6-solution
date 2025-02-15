@@ -18,21 +18,6 @@ public class HttpTaskServer {
 
     public static final int PORT = 8080;
     private final HttpServer server;
-    private TaskManager taskManager;
-
-    public HttpTaskServer(String pathName) throws IOException {
-        this(FileBackedTaskManager.loadFromFile(new File(pathName)));
-    }
-    public HttpTaskServer() throws IOException {
-        taskManager = new InMemoryTaskManager();
-        Gson gson = getGson();
-        this.server = HttpServer.create(new InetSocketAddress(PORT), 0);
-        server.createContext("/tasks", new TaskHandler(taskManager, gson));
-        server.createContext("/epics", new EpicHandler(taskManager, gson));
-        server.createContext("/subtasks", new SubtaskHandler(taskManager, gson));
-        server.createContext("/history", new HistoryHandler(taskManager, gson));
-        server.createContext("/prioritized", new PrioritizedHandler(taskManager, gson));
-    }
 
     public HttpTaskServer(TaskManager taskManager) throws IOException {
         Gson gson = getGson();
@@ -49,11 +34,6 @@ public class HttpTaskServer {
         server.start();
     }
 
-    public static void main(String[] args) throws IOException {
-        HttpTaskServer httpTaskServer = new HttpTaskServer("src/main/resources/tasks_info.csv");
-        //   HttpTaskServer httpTaskServer = new HttpTaskServer();
-        httpTaskServer.start();
-    }
 
     public void stop() {
         server.stop(0);
