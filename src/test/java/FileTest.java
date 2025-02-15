@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,26 +25,27 @@ public class FileTest {
         File tempFile = File.createTempFile("testFile", ".txt");
         try (FileWriter writer = new FileWriter(tempFile)) {
             writer.write("id,type,name,status,description,epicId\n" +
-                    "1, Task, Обычная таска, NEW, Описание таски\n" +
-                    "2, Epic, Эпическая задача_1, IN_PROGRESS, Это очень важная задача\n" +
-                    "3, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 2\n");
+                    "1, TASK, Обычная таска, NEW, Описание таски, 30, 2025-01-28T00:24:51.190778600\n" +
+                    "2, EPIC, Эпическая задача_1, IN_PROGRESS, Это очень важная задача, 15, 2025-01-28T01:04:51" +
+                    ".191778800\n" +
+                    "3, SUBTASK, Сабтаска эпика 1, DONE, Описание сабтаски, 15, 2025-01-28T00:24:51.211778400, 2\n");
         }
         TaskManager taskManager = FileBackedTaskManager.loadFromFile(tempFile);
         Task task = new Task();
         task.setId(1);
-        task.createTitle("Обычная таска");
+        task.setTitle("Обычная таска");
         task.setStatus(Status.NEW);
         task.setDescription("Описание таски");
         assertEquals(task, taskManager.getAllTasks().get(0));
         Epic epic = new Epic();
         epic.setId(2);
-        epic.createTitle("Эпическая задача_1");
+        epic.setTitle("Эпическая задача_1");
         epic.setStatus(Status.IN_PROGRESS);
         epic.setDescription("Это очень важная задача");
         assertEquals(epic, taskManager.getAllEpicTasks().get(0));
         Subtask subtask = new Subtask();
         subtask.setId(3);
-        subtask.createTitle("Сабтаска эпика 1");
+        subtask.setTitle("Сабтаска эпика 1");
         subtask.setStatus(Status.DONE);
         subtask.setDescription("Описание сабтаски");
         subtask.setEpicId(2);
@@ -58,27 +62,40 @@ public class FileTest {
         String content = Files.readString(tempFile.toPath());
         assertEquals("", content);
         TaskManager manager = Managers.getDefault(tempFile.toPath().toString());
+        String actualTime = "2024-01-27T10:30:03";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(actualTime, formatter);
         Task someTask = new Task();
-        someTask.createTitle("Обычная таска");
+        someTask.setTitle("Обычная таска");
         someTask.setDescription("Описание таски");
+        someTask.setStartTime(dateTime);
+        someTask.setDuration(Duration.ofMinutes(30));
         Epic someAnotherEpicTask = new Epic();
-        someAnotherEpicTask.createTitle("Эпическая задача_1");
+        someAnotherEpicTask.setTitle("Эпическая задача_1");
         someAnotherEpicTask.setDescription("Это очень важная задача");
         someAnotherEpicTask.setStatus(Status.IN_PROGRESS);
+        someAnotherEpicTask.setStartTime(dateTime);
+        someAnotherEpicTask.setDuration(Duration.ofMinutes(15));
+        someAnotherEpicTask.setEndTime(dateTime.plusMinutes(40));
         Subtask someAnotherSubtask = new Subtask();
         someAnotherSubtask.setEpic(someAnotherEpicTask);
-        someAnotherSubtask.createTitle("Сабтаска эпика 1");
+        someAnotherSubtask.setTitle("Сабтаска эпика 1");
         someAnotherSubtask.setDescription("Описание сабтаски");
         someAnotherSubtask.setStatus(Status.DONE);
+        someAnotherSubtask.setStartTime(dateTime);
+        someAnotherSubtask.setDuration(Duration.ofMinutes(15));
+        someAnotherEpicTask.addSubtask(someAnotherSubtask);
         manager.addEpicTask(someAnotherEpicTask);
         manager.addSubTask(someAnotherSubtask);
         manager.addTask(someTask);
 
         content = Files.readString(tempFile.toPath());
-        assertEquals("id,type,name,status,description,epicId" +
-                "1, Task, Обычная таска, NEW, Описание таски" +
-                "2, Epic, Эпическая задача_1, IN_PROGRESS, Это очень важная задача" +
-                "3, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 2", content.replaceAll("\n", "").replaceAll("\r", ""));
+        assertEquals("id,type,name,status,description,duration,startTime,epicId" +
+                        "241, Task, Обычная таска, NEW, Описание таски, 30, 2024-01-27T10:30:03" +
+                        "242, Epic, Эпическая задача_1, DONE, Это очень важная задача, 15, 2024-01-27T10:30:03" +
+                        "243, Subtask, Сабтаска эпика 1, DONE, Описание сабтаски, 15, 2024-01-27T10:30:03, 242",
+                content.replaceAll("\n", "").replaceAll(
+                        "\r", ""));
         if (tempFile.exists()) {
             Files.delete(tempFile.toPath());
         }
@@ -94,7 +111,7 @@ public class FileTest {
         manager.deleteAllEpicTasks();
         manager.deleteAllSubTasks();
         content = Files.readString(tempFile.toPath());
-        assertEquals("id,type,name,status,description,epicId", content.replaceAll("\n", "").replaceAll("\r", ""));
+        assertEquals("id,type,name,status,description,duration,startTime,epicId", content.replaceAll("\n", "").replaceAll("\r", ""));
         if (tempFile.exists()) {
             Files.delete(tempFile.toPath());
         }
